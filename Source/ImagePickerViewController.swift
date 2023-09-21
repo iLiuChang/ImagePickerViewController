@@ -9,16 +9,15 @@ import UIKit
 import MediaPlayer
 import Photos
 
-public protocol ImagePickerDelegate: AnyObject {
-    
-    func stackButtonDidSelect(_ imagePicker: ImagePickerViewController, images: [UIImage])
-    func doneButtonDidSelect(_ imagePicker: ImagePickerViewController, images: [UIImage])
-    func cancelButtonDidSelect(_ imagePicker: ImagePickerViewController)
+public protocol ImagePickerViewControllerDelegate: AnyObject {
+    func didLookAtPicking(_ imagePicker: ImagePickerViewController, items: [MediaItem])
+    func didFinishPicking(_ imagePicker: ImagePickerViewController, items: [MediaItem])
+    func didCancelPicking(_ imagePicker: ImagePickerViewController)
 }
 
 open class ImagePickerViewController: UIViewController {
     
-    let configuration: ImageConfiguration
+    let configuration: ImagePickerConfiguration
     
     open lazy var galleryView: ImageGalleryView = { [unowned self] in
         let galleryView = ImageGalleryView(configuration: self.configuration)
@@ -62,7 +61,7 @@ open class ImagePickerViewController: UIViewController {
     
     private var volume = AVAudioSession.sharedInstance().outputVolume
     
-    open weak var delegate: ImagePickerDelegate?
+    open weak var delegate: ImagePickerViewControllerDelegate?
     open var stack = ImageStack()
     open var imageLimit = 0
     open var preferredImageSize: CGSize?
@@ -82,18 +81,18 @@ open class ImagePickerViewController: UIViewController {
     
     // MARK: - Initialization
     
-    public init(configuration: ImageConfiguration) {
+    public init(configuration: ImagePickerConfiguration) {
         self.configuration = configuration
         super.init(nibName: nil, bundle: nil)
     }
     
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        self.configuration = ImageConfiguration()
+        self.configuration = ImagePickerConfiguration()
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
     public required init?(coder aDecoder: NSCoder) {
-        self.configuration = ImageConfiguration()
+        self.configuration = ImagePickerConfiguration()
         super.init(coder: aDecoder)
     }
     
@@ -310,30 +309,30 @@ extension ImagePickerViewController: BottomContainerViewDelegate {
         takePicture()
     }
     
-    func doneButtonDidSelect() {
-        var images: [UIImage]
+    func didFinishPicking() {
+        var images: [MediaItem]
         if let preferredImageSize = preferredImageSize {
             images = AssetManager.resolveAssets(stack.assets, size: preferredImageSize)
         } else {
             images = AssetManager.resolveAssets(stack.assets)
         }
         
-        delegate?.doneButtonDidSelect(self, images: images)
+        delegate?.didFinishPicking(self, items: images)
     }
     
-    func cancelButtonDidSelect() {
-        delegate?.cancelButtonDidSelect(self)
+    func didCancelPicking() {
+        delegate?.didCancelPicking(self)
     }
     
     func imageStackViewDidPress() {
-        var images: [UIImage]
+        var images: [MediaItem]
         if let preferredImageSize = preferredImageSize {
             images = AssetManager.resolveAssets(stack.assets, size: preferredImageSize)
         } else {
             images = AssetManager.resolveAssets(stack.assets)
         }
         
-        delegate?.stackButtonDidSelect(self, images: images)
+        delegate?.didLookAtPicking(self, items: images)
     }
 }
 

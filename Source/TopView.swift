@@ -21,7 +21,7 @@ open class TopView: UIView {
         static let height: CGFloat = 34
     }
     
-    var configuration = ImageConfiguration()
+    var configuration = ImagePickerConfiguration()
     
     var currentFlashIndex = 0
     let flashButtonTitles = ["AUTO", "ON", "OFF"]
@@ -33,7 +33,7 @@ open class TopView: UIView {
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
         button.setTitleColor(UIColor.white, for: UIControl.State())
         button.setTitleColor(UIColor.white, for: .highlighted)
-        button.titleLabel?.font = self.configuration.flashButton
+        button.titleLabel?.font = self.configuration.flashButtonFont
         button.addTarget(self, action: #selector(flashButtonDidPress(_:)), for: .touchUpInside)
         button.contentHorizontalAlignment = .left
         button.accessibilityLabel = "Flash mode is auto"
@@ -57,7 +57,7 @@ open class TopView: UIView {
     
     // MARK: - Initializers
     
-    public init(configuration: ImageConfiguration? = nil) {
+    public init(configuration: ImagePickerConfiguration? = nil) {
         if let configuration = configuration {
             self.configuration = configuration
         }

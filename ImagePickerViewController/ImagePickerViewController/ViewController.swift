@@ -26,7 +26,7 @@ class ViewController: UIViewController {
     
     
     @objc func click(button: UIButton) {
-        var config = ImageConfiguration()
+        var config = ImagePickerConfiguration()
         config.allowMultiplePhotoSelection = false
         config.allowVideoSelection = true
         config.cellColumn = 4
@@ -43,18 +43,18 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: ImagePickerDelegate {
-    func stackButtonDidSelect(_ imagePicker: ImagePickerViewController, images: [UIImage]) {
+extension ViewController: ImagePickerViewControllerDelegate {
+    func didLookAtPicking(_ imagePicker: ImagePickerViewController, items: [MediaItem]) {
         imagePicker.dismiss(animated: true, completion: nil)
-        button.setImage(images.first, for: .normal)
+        button.setImage(items.first?.image, for: .normal)
     }
     
-    func doneButtonDidSelect(_ imagePicker: ImagePickerViewController, images: [UIImage]) {
+    func didFinishPicking(_ imagePicker: ImagePickerViewController, items: [MediaItem]) {
         imagePicker.dismiss(animated: true, completion: nil)
-        button.setImage(images.first, for: .normal)
+        button.setImage(items.first?.image, for: .normal)
     }
-    
-    func cancelButtonDidSelect(_ imagePicker: ImagePickerViewController) {
+
+    func didCancelPicking(_ imagePicker: ImagePickerViewController) {
         imagePicker.dismiss(animated: true, completion: nil)
     }
     

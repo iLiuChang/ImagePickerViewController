@@ -16,7 +16,7 @@
 		282542512AB94EB700FE1334 /* ButtonPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282542502AB94EB700FE1334 /* ButtonPicker.swift */; };
 		282542532AB94ECE00FE1334 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282542522AB94ECE00FE1334 /* CameraManager.swift */; };
 		282542552AB94EDA00FE1334 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282542542AB94EDA00FE1334 /* CameraView.swift */; };
-		282542572AB94EED00FE1334 /* ImageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282542562AB94EED00FE1334 /* ImageConfiguration.swift */; };
+		282542572AB94EED00FE1334 /* ImagePickerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282542562AB94EED00FE1334 /* ImagePickerConfiguration.swift */; };
 		282542592AB94F3600FE1334 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282542582AB94F3600FE1334 /* Helper.swift */; };
 		2825425D2AB94F5A00FE1334 /* ImageGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2825425C2AB94F5A00FE1334 /* ImageGalleryView.swift */; };
 		2825425F2AB94F6800FE1334 /* ImageGalleryViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2825425E2AB94F6800FE1334 /* ImageGalleryViewCell.swift */; };
@@ -32,6 +32,7 @@
 		282542892AB9588800FE1334 /* AUTO@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 282542822AB9588800FE1334 /* AUTO@3x.png */; };
 		2825428A2AB9588800FE1334 /* video@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 282542832AB9588800FE1334 /* video@3x.png */; };
 		2825428B2AB9588800FE1334 /* cameraIcon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 282542842AB9588800FE1334 /* cameraIcon@3x.png */; };
+		2873CCBD2ABBE74A00AFA113 /* MediaItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2873CCBC2ABBE74A00AFA113 /* MediaItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +47,7 @@
 		282542502AB94EB700FE1334 /* ButtonPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonPicker.swift; sourceTree = "<group>"; };
 		282542522AB94ECE00FE1334 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		282542542AB94EDA00FE1334 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
-		282542562AB94EED00FE1334 /* ImageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConfiguration.swift; sourceTree = "<group>"; };
+		282542562AB94EED00FE1334 /* ImagePickerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerConfiguration.swift; sourceTree = "<group>"; };
 		282542582AB94F3600FE1334 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		2825425C2AB94F5A00FE1334 /* ImageGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGalleryView.swift; sourceTree = "<group>"; };
 		2825425E2AB94F6800FE1334 /* ImageGalleryViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGalleryViewCell.swift; sourceTree = "<group>"; };
@@ -62,6 +63,7 @@
 		282542822AB9588800FE1334 /* AUTO@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AUTO@3x.png"; sourceTree = "<group>"; };
 		282542832AB9588800FE1334 /* video@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "video@3x.png"; sourceTree = "<group>"; };
 		282542842AB9588800FE1334 /* cameraIcon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cameraIcon@3x.png"; sourceTree = "<group>"; };
+		2873CCBC2ABBE74A00AFA113 /* MediaItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +115,7 @@
 				282542502AB94EB700FE1334 /* ButtonPicker.swift */,
 				282542522AB94ECE00FE1334 /* CameraManager.swift */,
 				282542542AB94EDA00FE1334 /* CameraView.swift */,
-				282542562AB94EED00FE1334 /* ImageConfiguration.swift */,
+				282542562AB94EED00FE1334 /* ImagePickerConfiguration.swift */,
 				282542582AB94F3600FE1334 /* Helper.swift */,
 				2825425C2AB94F5A00FE1334 /* ImageGalleryView.swift */,
 				2825425E2AB94F6800FE1334 /* ImageGalleryViewCell.swift */,
@@ -123,6 +125,7 @@
 				282542662AB94FE900FE1334 /* ImageStackView.swift */,
 				282542682AB94FF500FE1334 /* TopView.swift */,
 				2825426A2AB9500200FE1334 /* VideoInfoView.swift */,
+				2873CCBC2ABBE74A00AFA113 /* MediaItem.swift */,
 			);
 			name = Source;
 			path = ../../Source;
@@ -225,6 +228,7 @@
 				282542532AB94ECE00FE1334 /* CameraManager.swift in Sources */,
 				282542512AB94EB700FE1334 /* ButtonPicker.swift in Sources */,
 				282542632AB94FC700FE1334 /* ImageStack.swift in Sources */,
+				2873CCBD2ABBE74A00AFA113 /* MediaItem.swift in Sources */,
 				282542692AB94FF500FE1334 /* TopView.swift in Sources */,
 				2825425D2AB94F5A00FE1334 /* ImageGalleryView.swift in Sources */,
 				2825424D2AB94E6D00FE1334 /* AssetManager.swift in Sources */,
@@ -232,7 +236,7 @@
 				2825425F2AB94F6800FE1334 /* ImageGalleryViewCell.swift in Sources */,
 				282542592AB94F3600FE1334 /* Helper.swift in Sources */,
 				282542382AB94D4200FE1334 /* AppDelegate.swift in Sources */,
-				282542572AB94EED00FE1334 /* ImageConfiguration.swift in Sources */,
+				282542572AB94EED00FE1334 /* ImagePickerConfiguration.swift in Sources */,
 				2825424F2AB94E9E00FE1334 /* BottomContainerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

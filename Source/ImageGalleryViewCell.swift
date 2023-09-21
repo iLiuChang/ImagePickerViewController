@@ -48,7 +48,7 @@ class ImageGalleryViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - ImageConfiguration
+    // MARK: - ImagePickerConfiguration
     
     func configureCell(_ image: UIImage) {
         imageView.image = image

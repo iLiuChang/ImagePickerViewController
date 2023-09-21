@@ -21,7 +21,7 @@ open class ImageGalleryView: UIView {
         static let galleryBarHeight: CGFloat = 30
     }
     
-    var configuration = ImageConfiguration()
+    var configuration = ImagePickerConfiguration()
     
     lazy private var collectionView: UICollectionView = { [unowned self] in
         let collectionView = UICollectionView(frame: CGRect.zero,
@@ -71,7 +71,7 @@ open class ImageGalleryView: UIView {
     var imageLimit = 0
     // MARK: - Initializers
     
-    public init(configuration: ImageConfiguration? = nil) {
+    public init(configuration: ImagePickerConfiguration? = nil) {
         if let configuration = configuration {
             self.configuration = configuration
         }

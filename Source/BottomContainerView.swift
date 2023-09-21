@@ -10,8 +10,8 @@ import UIKit
 protocol BottomContainerViewDelegate: AnyObject {
     
     func pickerButtonDidPress()
-    func doneButtonDidSelect()
-    func cancelButtonDidSelect()
+    func didFinishPicking()
+    func didCancelPicking()
     func imageStackViewDidPress()
 }
 
@@ -21,7 +21,7 @@ open class BottomContainerView: UIView {
         static let height: CGFloat = 100
     }
     
-    var configuration = ImageConfiguration()
+    var configuration = ImagePickerConfiguration()
     
     lazy var pickerButton: ButtonPicker = { [unowned self] in
         let pickerButton = ButtonPicker(configuration: self.configuration)
@@ -45,8 +45,8 @@ open class BottomContainerView: UIView {
     open lazy var doneButton: UIButton = { [unowned self] in
         let button = UIButton()
         button.setTitle(self.configuration.cancelButtonTitle, for: UIControl.State())
-        button.titleLabel?.font = self.configuration.doneButton
-        button.addTarget(self, action: #selector(doneButtonDidSelect(_:)), for: .touchUpInside)
+        button.titleLabel?.font = self.configuration.finshButtonFont
+        button.addTarget(self, action: #selector(didFinishPicking(_:)), for: .touchUpInside)
         
         return button
     }()
@@ -72,7 +72,7 @@ open class BottomContainerView: UIView {
     
     // MARK: Initializers
     
-    public init(configuration: ImageConfiguration? = nil) {
+    public init(configuration: ImagePickerConfiguration? = nil) {
         if let configuration = configuration {
             self.configuration = configuration
         }
@@ -99,11 +99,11 @@ open class BottomContainerView: UIView {
     
     // MARK: - Action methods
     
-    @objc func doneButtonDidSelect(_ button: UIButton) {
+    @objc func didFinishPicking(_ button: UIButton) {
         if button.currentTitle == configuration.cancelButtonTitle {
-            delegate?.cancelButtonDidSelect()
+            delegate?.didCancelPicking()
         } else {
-            delegate?.doneButtonDidSelect()
+            delegate?.didFinishPicking()
         }
     }
     

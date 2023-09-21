@@ -20,7 +20,7 @@ class ButtonPicker: UIButton {
         static let buttonBorderSize: CGFloat = 68
     }
     
-    var imageConfiguration = ImageConfiguration()
+    var imageConfiguration = ImagePickerConfiguration()
     
     lazy var numberLabel: UILabel = { [unowned self] in
         let label = UILabel()
@@ -34,7 +34,7 @@ class ButtonPicker: UIButton {
     
     // MARK: - Initializers
     
-    public init(configuration: ImageConfiguration? = nil) {
+    public init(configuration: ImagePickerConfiguration? = nil) {
         if let configuration = configuration {
             self.imageConfiguration = configuration
         }

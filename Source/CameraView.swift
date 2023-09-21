@@ -17,7 +17,7 @@ protocol CameraViewDelegate: AnyObject {
 
 class CameraView: UIViewController, CLLocationManagerDelegate, CameraManagerDelegate {
     
-    var configuration = ImageConfiguration()
+    var configuration = ImagePickerConfiguration()
     
     lazy var blurView: UIVisualEffectView = { [unowned self] in
         let effect = UIBlurEffect(style: .dark)
@@ -79,7 +79,7 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManagerDele
     private var currentZoomFactor: CGFloat = 1.0
     private var previousZoomFactor: CGFloat = 1.0
     
-    public init(configuration: ImageConfiguration? = nil) {
+    public init(configuration: ImagePickerConfiguration? = nil) {
         if let configuration = configuration {
             self.configuration = configuration
         }

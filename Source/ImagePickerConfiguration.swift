@@ -1,5 +1,5 @@
 //
-//  ImageConfiguration.swift
+//  ImagePickerConfiguration.swift
 //  ImagePickerViewController
 //
 //  Created by LC on 2023/9/19.
@@ -8,7 +8,7 @@
 import AVFoundation
 import UIKit
 
-public struct ImageConfiguration {
+public struct ImagePickerConfiguration {
     
     // MARK: Colors
     
@@ -20,8 +20,8 @@ public struct ImageConfiguration {
     // MARK: Fonts
     
     public var numberLabelFont = UIFont.systemFont(ofSize: 19, weight: .bold)
-    public var doneButton = UIFont.systemFont(ofSize: 19, weight: .medium)
-    public var flashButton = UIFont.systemFont(ofSize: 12, weight: .medium)
+    public var finshButtonFont = UIFont.systemFont(ofSize: 19, weight: .medium)
+    public var flashButtonFont = UIFont.systemFont(ofSize: 12, weight: .medium)
     
     // MARK: Titles
     
@@ -48,12 +48,12 @@ public struct ImageConfiguration {
     public var allowedOrientations = UIInterfaceOrientationMask.all
     public var allowVolumeWhenTakingPicture = true
     public var useLowResolutionPreviewImage = false
+    public var selectedBackgroundView: (() -> UIView)? = nil
     
-    public var selectedBackgroundView: (() -> UIView)?
-    
+    public init() { }
 }
 
-extension ImageConfiguration {
+extension ImagePickerConfiguration {
     
     public var rotationTransform: CGAffineTransform {
         let currentOrientation = UIDevice.current.orientation
