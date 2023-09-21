@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "ImagePickerViewController"
-  s.version      = "1.0.0"
+  s.version      = "1.1.0"
   s.summary      = "A view controller that manages the system interfaces for taking pictures and choosing items from the user’s media library."
   s.homepage     = "https://github.com/iLiuChang/ImagePickerViewController"
   s.license      = "MIT"
