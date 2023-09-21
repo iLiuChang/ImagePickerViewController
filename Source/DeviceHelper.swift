@@ -1,5 +1,5 @@
 //
-//  Helper.swift
+//  DeviceHelper.swift
 //  ImagePickerViewController
 //
 //  Created by LC on 2023/9/19.
@@ -8,23 +8,10 @@
 import UIKit
 import AVFoundation
 
-struct Helper {
+struct DeviceHelper {
     
     static var previousOrientation = UIDeviceOrientation.unknown
-    
-    static func getTransform(fromDeviceOrientation orientation: UIDeviceOrientation) -> CGAffineTransform {
-        switch orientation {
-        case .landscapeLeft:
-            return CGAffineTransform(rotationAngle: CGFloat.pi * 0.5)
-        case .landscapeRight:
-            return CGAffineTransform(rotationAngle: -(CGFloat.pi * 0.5))
-        case .portraitUpsideDown:
-            return CGAffineTransform(rotationAngle: CGFloat.pi)
-        default:
-            return CGAffineTransform.identity
-        }
-    }
-    
+        
     static func getVideoOrientation(fromDeviceOrientation orientation: UIDeviceOrientation) -> AVCaptureVideoOrientation {
         switch orientation {
         case .landscapeLeft:

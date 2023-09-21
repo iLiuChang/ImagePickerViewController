@@ -16,24 +16,24 @@ protocol TopViewDelegate: AnyObject {
 open class TopView: UIView {
     
     struct Dimensions {
-        static let leftOffset: CGFloat = 11
-        static let rightOffset: CGFloat = 7
-        static let height: CGFloat = 34
+        static let leftOffset: CGFloat = 15
+        static let rightOffset: CGFloat = -7
+        static let height: CGFloat = 44
     }
     
     var configuration = ImagePickerConfiguration()
     
     var currentFlashIndex = 0
-    let flashButtonTitles = ["AUTO", "ON", "OFF"]
+    let flashButtonTitles = ["OFF", "ON", "OFF"]
     
     open lazy var flashButton: UIButton = { [unowned self] in
         let button = UIButton()
-        button.setImage(AssetManager.getImage("AUTO"), for: UIControl.State())
+        button.setImage(AssetManager.getImage("OFF"), for: UIControl.State())
         button.setTitle("AUTO", for: UIControl.State())
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
+        button.titleEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
         button.setTitleColor(UIColor.white, for: UIControl.State())
         button.setTitleColor(UIColor.white, for: .highlighted)
-        button.titleLabel?.font = self.configuration.flashButtonFont
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 6, weight: .regular)
         button.addTarget(self, action: #selector(flashButtonDidPress(_:)), for: .touchUpInside)
         button.contentHorizontalAlignment = .left
         button.accessibilityLabel = "Flash mode is auto"
@@ -100,21 +100,10 @@ open class TopView: UIView {
     @objc func flashButtonDidPress(_ button: UIButton) {
         currentFlashIndex += 1
         currentFlashIndex = currentFlashIndex % flashButtonTitles.count
-        
-        switch currentFlashIndex {
-        case 1:
-            button.setTitleColor(UIColor(red: 0.98, green: 0.98, blue: 0.45, alpha: 1), for: UIControl.State())
-            button.setTitleColor(UIColor(red: 0.52, green: 0.52, blue: 0.24, alpha: 1), for: .highlighted)
-            
-        default:
-            button.setTitleColor(UIColor.white, for: UIControl.State())
-            button.setTitleColor(UIColor.white, for: .highlighted)
-        }
-        
         let newTitle = flashButtonTitles[currentFlashIndex]
         
         button.setImage(AssetManager.getImage(newTitle), for: UIControl.State())
-        button.setTitle(newTitle, for: UIControl.State())
+        button.setTitle(currentFlashIndex == 0 ? "AUTO" : nil, for: UIControl.State())
         button.accessibilityLabel = "Flash mode is \(newTitle)"
         
         delegate?.flashButtonDidPress(newTitle)
@@ -138,7 +127,7 @@ extension TopView {
         
         addConstraint(NSLayoutConstraint(item: flashButton, attribute: .width,
                                          relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-                                         multiplier: 1, constant: 55))
+                                         multiplier: 1, constant: Dimensions.height))
         
         if configuration.canRotateCamera {
             addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .right,
@@ -151,11 +140,11 @@ extension TopView {
             
             addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .width,
                                              relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-                                             multiplier: 1, constant: 55))
+                                             multiplier: 1, constant: Dimensions.height))
             
             addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .height,
                                              relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-                                             multiplier: 1, constant: 55))
+                                             multiplier: 1, constant: Dimensions.height))
         }
     }
 }

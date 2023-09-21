@@ -23,7 +23,6 @@ open class ImagePickerViewController: UIViewController {
         let galleryView = ImageGalleryView(configuration: self.configuration)
         galleryView.delegate = self
         galleryView.selectedStack = self.stack
-        galleryView.imageLimit = self.imageLimit
         
         return galleryView
     }()
@@ -63,7 +62,6 @@ open class ImagePickerViewController: UIViewController {
     
     open weak var delegate: ImagePickerViewControllerDelegate?
     open var stack = ImageStack()
-    open var imageLimit = 0
     open var preferredImageSize: CGSize?
     open var startOnFrontCamera = false
     private var numberOfCells: Int?
@@ -71,10 +69,10 @@ open class ImagePickerViewController: UIViewController {
     private var galleryViewTop: NSLayoutConstraint?
     private var galleryViewTopStart: CGFloat = 0
     fileprivate var isTakingPicture = false
-    open var doneButtonTitle: String? {
+    open var finishButtonTitle: String? {
         didSet {
-            if let doneButtonTitle = doneButtonTitle {
-                bottomContainer.doneButton.setTitle(doneButtonTitle, for: UIControl.State())
+            if let finishButtonTitle = finishButtonTitle {
+                bottomContainer.doneButton.setTitle(finishButtonTitle, for: UIControl.State())
             }
         }
     }
@@ -238,39 +236,18 @@ open class ImagePickerViewController: UIViewController {
         guard let sender = notification.object as? ImageStack else { return }
         
         let title = !sender.assets.isEmpty ?
-        configuration.doneButtonTitle : configuration.cancelButtonTitle
+        configuration.finishButtonTitle : configuration.cancelButtonTitle
         bottomContainer.doneButton.setTitle(title, for: UIControl.State())
     }
     
     @objc public func handleRotation(_ note: Notification?) {
-        applyOrientationTransforms()
-    }
-    
-    func applyOrientationTransforms() {
-        
         self.galleryViewTop?.constant = 0
-        let rotate = configuration.rotationTransform
-        
-        UIView.animate(withDuration: 0.25, animations: {
-            [self.topView.rotateCamera, self.bottomContainer.pickerButton,
-             self.bottomContainer.stackView, self.bottomContainer.doneButton].forEach {
-                $0.transform = rotate
-            }
-            
+        DispatchQueue.main.async {
             self.galleryView.collectionViewLayout.invalidateLayout()
-            
-            let translate: CGAffineTransform
-            if Helper.previousOrientation.isLandscape {
-                translate = CGAffineTransform(translationX: -20, y: 15)
-            } else {
-                translate = CGAffineTransform.identity
-            }
-            
-            self.topView.flashButton.transform = rotate.concatenating(translate)
-        })
+        }
     }
     
-    // MARK: - Helpers
+    // MARK: - DeviceHelpers
     
     open override var prefersStatusBarHidden: Bool {
         return statusBarHidden
@@ -285,7 +262,7 @@ open class ImagePickerViewController: UIViewController {
     }
     
     fileprivate func isBelowImageLimit() -> Bool {
-        return (imageLimit == 0 || imageLimit > galleryView.selectedStack.assets.count)
+        return (configuration.imageLimit == 0 || configuration.imageLimit > galleryView.selectedStack.assets.count)
     }
     
     fileprivate func takePicture() {
@@ -348,7 +325,7 @@ extension ImagePickerViewController: CameraViewDelegate {
         
         galleryView.fetchPhotos {
             guard let asset = self.galleryView.assets.first else { return }
-            if self.configuration.allowMultiplePhotoSelection == false {
+            if self.configuration.allowMultipleSelection == false {
                 self.stack.assets.removeAll()
             }
             self.stack.pushAsset(asset)
@@ -395,32 +372,18 @@ extension ImagePickerViewController: ImageGalleryPanGestureDelegate {
     }
     
     func panGestureDidChange(_ translation: CGPoint) {
-        self.galleryViewTop?.constant = galleryViewTopStart + translation.y
+        var offset = galleryViewTopStart + translation.y
+        let max = galleryView.frame.height - ImageGalleryView.Dimensions.galleryBarHeight - TopView.Dimensions.height
+
+        if offset <= 0 {
+            offset = 0
+        } else if offset > max {
+            offset = max
+        }
+        self.galleryViewTop?.constant = offset
     }
     
     func panGestureDidEnd(translation: CGPoint, velocity: CGPoint) {
-        let offset = galleryViewTopStart + translation.y
-        let max = galleryView.frame.height - ImageGalleryView.Dimensions.galleryBarHeight - TopView.Dimensions.height
-        if offset <= 0 {
-            damping(0)
-        } else {
-            if offset > max {
-                damping(max)
-            } else {
-                if offset < max/2 {
-                    damping(0)
-                } else {
-                    damping(max)
-                }
-            }
-        }
-        
-        func damping(_ offetValue: CGFloat) {
-            UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 0.4, initialSpringVelocity: 30) { [weak self] in
-                self?.galleryViewTop?.constant = offetValue
-                self?.view.layoutIfNeeded()
-            }
-        }
         
     }
 }
@@ -429,10 +392,11 @@ extension ImagePickerViewController {
     
     func setupConstraints() {
         
+        
         NSLayoutConstraint.activate([
             topView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             topView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            topView.topAnchor.constraint(equalTo: view.topAnchor),
+            topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             topView.heightAnchor.constraint(equalToConstant: TopView.Dimensions.height)
         ])
         
@@ -456,7 +420,7 @@ extension ImagePickerViewController {
             galleryView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             galleryView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             galleryViewTop!,
-            galleryView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -TopView.Dimensions.height-BottomContainerView.Dimensions.height)
+            galleryView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -BottomContainerView.Dimensions.height-bottom)
         ])
         
     }

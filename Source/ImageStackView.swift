@@ -62,7 +62,7 @@ class ImageStackView: UIView {
         NotificationCenter.default.removeObserver(self)
     }
     
-    // MARK: - Helpers
+    // MARK: - DeviceHelpers
     
     func subscribe() {
         NotificationCenter.default.addObserver(self,

@@ -18,7 +18,7 @@ protocol ImageGalleryPanGestureDelegate: AnyObject {
 open class ImageGalleryView: UIView {
     
     struct Dimensions {
-        static let galleryBarHeight: CGFloat = 30
+        static let galleryBarHeight: CGFloat = 34
     }
     
     var configuration = ImagePickerConfiguration()
@@ -68,7 +68,6 @@ open class ImageGalleryView: UIView {
     var shouldTransform = false
     var imagesBeforeLoading = 0
     var fetchResult: PHFetchResult<AnyObject>?
-    var imageLimit = 0
     // MARK: - Initializers
     
     public init(configuration: ImagePickerConfiguration? = nil) {
@@ -184,7 +183,7 @@ extension ImageGalleryView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath)
                 as? ImageGalleryViewCell else { return }
-        if configuration.allowMultiplePhotoSelection == false {
+        if configuration.allowMultipleSelection == false {
             // Clear selected photos array
             for asset in self.selectedStack.assets {
                 self.selectedStack.dropAsset(asset)
@@ -204,7 +203,7 @@ extension ImageGalleryView: UICollectionViewDelegate {
             if cell.selectedView?.isHidden == false  {
                 cell.selectedView?.isHidden = true
                 self.selectedStack.dropAsset(asset)
-            } else if self.imageLimit == 0 || self.imageLimit > self.selectedStack.assets.count {
+            } else if self.configuration.imageLimit == 0 || self.configuration.imageLimit > self.selectedStack.assets.count {
                 cell.selectedView?.isHidden = false
                 self.selectedStack.pushAsset(asset)
             }

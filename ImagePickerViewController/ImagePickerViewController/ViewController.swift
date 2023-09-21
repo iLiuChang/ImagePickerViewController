@@ -27,17 +27,18 @@ class ViewController: UIViewController {
     
     @objc func click(button: UIButton) {
         var config = ImagePickerConfiguration()
-        config.allowMultiplePhotoSelection = false
+        config.allowMultipleSelection = true
         config.allowVideoSelection = true
         config.cellColumn = 4
+        config.imageLimit = 3
         config.selectedBackgroundView = {
             let button = UIButton()
             button.setBackgroundImage(AssetManager.getImage("focusIcon"), for: .normal)
             return button
         }
         let imagePicker = ImagePickerViewController(configuration: config)
-        imagePicker.imageLimit = 7
         imagePicker.delegate = self
+//        imagePicker.modalPresentationStyle = .fullScreen
         present(imagePicker, animated: true, completion: nil)
 
     }
