@@ -16,7 +16,7 @@ protocol TopViewDelegate: AnyObject {
 open class TopView: UIView {
     
     struct Dimensions {
-        static let leftOffset: CGFloat = 15
+        static let leftOffset: CGFloat = 2
         static let rightOffset: CGFloat = -7
         static let height: CGFloat = 44
     }
@@ -24,18 +24,12 @@ open class TopView: UIView {
     var configuration = ImagePickerConfiguration()
     
     var currentFlashIndex = 0
-    let flashButtonTitles = ["OFF", "ON", "OFF"]
+    let flashButtonTitles = ["boltAuto", "boltOn", "boltOff"]
     
     open lazy var flashButton: UIButton = { [unowned self] in
         let button = UIButton()
-        button.setImage(AssetManager.getImage("OFF"), for: UIControl.State())
-        button.setTitle("AUTO", for: UIControl.State())
-        button.titleEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
-        button.setTitleColor(UIColor.white, for: UIControl.State())
-        button.setTitleColor(UIColor.white, for: .highlighted)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 6, weight: .regular)
+        button.setImage(AssetManager.getImage(flashButtonTitles[0]), for: UIControl.State())
         button.addTarget(self, action: #selector(flashButtonDidPress(_:)), for: .touchUpInside)
-        button.contentHorizontalAlignment = .left
         button.accessibilityLabel = "Flash mode is auto"
         button.accessibilityHint = "Double-tap to change flash mode"
         
@@ -103,7 +97,6 @@ open class TopView: UIView {
         let newTitle = flashButtonTitles[currentFlashIndex]
         
         button.setImage(AssetManager.getImage(newTitle), for: UIControl.State())
-        button.setTitle(currentFlashIndex == 0 ? "AUTO" : nil, for: UIControl.State())
         button.accessibilityLabel = "Flash mode is \(newTitle)"
         
         delegate?.flashButtonDidPress(newTitle)
@@ -129,6 +122,10 @@ extension TopView {
                                          relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
                                          multiplier: 1, constant: Dimensions.height))
         
+        addConstraint(NSLayoutConstraint(item: flashButton, attribute: .height,
+                                         relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
+                                         multiplier: 1, constant: Dimensions.height))
+
         if configuration.canRotateCamera {
             addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .right,
                                              relatedBy: .equal, toItem: self, attribute: .right,

@@ -171,8 +171,8 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManagerDele
     
     func flashCamera(_ title: String) {
         let mapping: [String: AVCaptureDevice.FlashMode] = [
-            "ON": .on,
-            "OFF": .off
+            "boltOn": .on,
+            "boltOff": .off
         ]
         
         cameraManager.flash(mapping[title] ?? .auto)
