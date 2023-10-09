@@ -373,7 +373,7 @@ extension ImagePickerViewController: ImageGalleryPanGestureDelegate {
     
     func panGestureDidChange(_ translation: CGPoint) {
         var offset = galleryViewTopStart + translation.y
-        let max = galleryView.frame.height - ImageGalleryView.Dimensions.galleryBarHeight - TopView.Dimensions.height
+        let max = galleryView.frame.height - ImageGalleryView.Dimensions.galleryBarHeight
 
         if offset <= 0 {
             offset = 0
@@ -420,7 +420,7 @@ extension ImagePickerViewController {
             galleryView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             galleryView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             galleryViewTop!,
-            galleryView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -BottomContainerView.Dimensions.height-bottom)
+            galleryView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -BottomContainerView.Dimensions.height-bottom-TopView.Dimensions.height)
         ])
         
     }

@@ -31,7 +31,6 @@ open class ImageGalleryView: UIView {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        
         return collectionView
     }()
     
