@@ -9,28 +9,50 @@ import UIKit
 
 class ImageGalleryViewCell: UICollectionViewCell {
     
+    enum MediaType {
+        case unknown
+        case video(TimeInterval)
+        case gif
+    }
+    
     lazy var imageView = UIImageView()
     var selectedView: UIView?
     private var videoInfoView: VideoInfoView
     
     private let videoInfoBarHeight: CGFloat = 15
-    var duration: TimeInterval? {
+    
+    var mediaType: MediaType = .unknown {
         didSet {
-            if let duration = duration, duration > 0 {
-                self.videoInfoView.duration = duration
-                self.videoInfoView.isHidden = false
-            } else {
-                self.videoInfoView.isHidden = true
+            switch mediaType {
+            case .unknown:
+                videoInfoView.isHidden = true
+                typeLabel.isHidden = true
+            case .video(let duration):
+                videoInfoView.duration = duration
+                videoInfoView.isHidden = false
+                typeLabel.isHidden = true
+            case .gif:
+                videoInfoView.isHidden = true
+                typeLabel.isHidden = false
             }
         }
     }
     
+    lazy var typeLabel: UILabel = {
+        let typeLabel = UILabel()
+        typeLabel.font = UIFont.systemFont(ofSize: 10, weight: .medium)
+        typeLabel.textColor = .white
+        typeLabel.text = "GIF"
+        typeLabel.isHidden = true
+        return typeLabel
+    }()
+
     override init(frame: CGRect) {
         let videoBarFrame = CGRect(x: 0, y: frame.height - self.videoInfoBarHeight,
                                    width: frame.width, height: self.videoInfoBarHeight)
         videoInfoView = VideoInfoView(frame: videoBarFrame)
         super.init(frame: frame)
-        
+
         for view in [imageView, videoInfoView] as [UIView] {
             view.contentMode = .scaleAspectFill
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -38,6 +60,9 @@ class ImageGalleryViewCell: UICollectionViewCell {
             contentView.addSubview(view)
         }
         
+        typeLabel.frame = CGRect(x: 3, y: frame.height - self.videoInfoBarHeight, width: 100, height: self.videoInfoBarHeight)
+        contentView.addSubview(typeLabel)
+
         isAccessibilityElement = true
         accessibilityLabel = "Photo"
         

@@ -13,17 +13,23 @@ public protocol ImagePickerViewControllerDelegate: AnyObject {
     func didLookAtPicking(_ imagePicker: ImagePickerViewController, items: [MediaItem])
     func didFinishPicking(_ imagePicker: ImagePickerViewController, items: [MediaItem])
     func didCancelPicking(_ imagePicker: ImagePickerViewController)
+    func shouldSelectItem(_ imagePicker: ImagePickerViewController, asset: PHAsset) -> Bool
+}
+
+public extension ImagePickerViewControllerDelegate {
+    func shouldSelectItem(_ imagePicker: ImagePickerViewController, asset: PHAsset) -> Bool {
+        return true
+    }
 }
 
 open class ImagePickerViewController: UIViewController {
     
-    let configuration: ImagePickerConfiguration
+    public let configuration: ImagePickerConfiguration
     
     open lazy var galleryView: ImageGalleryView = { [unowned self] in
         let galleryView = ImageGalleryView(configuration: self.configuration)
         galleryView.delegate = self
         galleryView.selectedStack = self.stack
-        
         return galleryView
     }()
     
@@ -65,7 +71,6 @@ open class ImagePickerViewController: UIViewController {
     open var preferredImageSize: CGSize?
     open var startOnFrontCamera = false
     private var numberOfCells: Int?
-    private var statusBarHidden = true
     private var galleryViewTop: NSLayoutConstraint?
     private var galleryViewTopStart: CGFloat = 0
     fileprivate var isTakingPicture = false
@@ -98,30 +103,39 @@ open class ImagePickerViewController: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        
-        for subview in [cameraController.view, galleryView, bottomContainer, topView] {
-            view.addSubview(subview!)
-            subview?.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(bottomContainer)
+        bottomContainer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            bottomContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bottomContainer.heightAnchor.constraint(equalToConstant: BottomContainerView.Dimensions.height)
+        ])
+
+        switch configuration.sourceType {
+        case .default:
+            setupCamera()
+            setupPhotoLibrary()
+        case .photoLibrary:
+            setupPhotoLibrary()
+            galleryView.hideTopSeparator()
+            galleryViewTop?.constant = 0
+            bottomContainer.pickerButton.isHidden = true
+            bottomContainer.borderPickerButton.isHidden = true
+        case .camera:
+            setupCamera()
         }
         
-        view.addSubview(volumeView)
-        view.sendSubviewToBack(volumeView)
-        
-        view.backgroundColor = UIColor.white
         view.backgroundColor = configuration.mainColor
-        
+        view.bringSubviewToFront(bottomContainer)
         subscribe()
-        setupConstraints()
     }
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if configuration.managesAudioSession {
+        if configuration.sourceType != .photoLibrary && configuration.managesAudioSession {
             _ = try? AVAudioSession.sharedInstance().setActive(true)
         }
-        
-        statusBarHidden = UIApplication.shared.isStatusBarHidden
     }
     
     open override func viewDidAppear(_ animated: Bool) {
@@ -135,6 +149,9 @@ open class ImagePickerViewController: UIViewController {
     }
     
     func checkStatus() {
+        if configuration.sourceType == .camera {
+            return 
+        }
         let currentStatus = PHPhotoLibrary.authorizationStatus()
         guard currentStatus != .authorized else { return }
         
@@ -170,11 +187,11 @@ open class ImagePickerViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
-    func hideViews() {
+    fileprivate func hideViews() {
         enableGestures(false)
     }
     
-    func permissionGranted() {
+    fileprivate func permissionGranted() {
         galleryView.fetchPhotos()
         enableGestures(true)
     }
@@ -182,7 +199,7 @@ open class ImagePickerViewController: UIViewController {
     // MARK: - Notifications
     
     deinit {
-        if configuration.managesAudioSession {
+        if configuration.sourceType != .photoLibrary && configuration.managesAudioSession {
             _ = try? AVAudioSession.sharedInstance().setActive(false)
         }
         
@@ -204,22 +221,29 @@ open class ImagePickerViewController: UIViewController {
                                                selector: #selector(didReloadAssets(_:)),
                                                name: NSNotification.Name(rawValue: ImageStack.Notifications.stackDidReload),
                                                object: nil)
+
+        if configuration.sourceType != .camera {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(handleRotation(_:)),
+                                                   name: UIDevice.orientationDidChangeNotification,
+                                                   object: nil)
+        }
         
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(volumeChanged(_:)),
-                                               name: NSNotification.Name(rawValue: "AVSystemController_SystemVolumeDidChangeNotification"),
-                                               object: nil)
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(handleRotation(_:)),
-                                               name: UIDevice.orientationDidChangeNotification,
-                                               object: nil)
+        if configuration.sourceType != .photoLibrary {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(volumeChanged(_:)),
+                                                   name: NSNotification.Name(rawValue: "AVSystemController_SystemVolumeDidChangeNotification"),
+                                                   object: nil)
+        }
+
         
     }
     
     @objc func didReloadAssets(_ notification: Notification) {
         adjustButtonTitle(notification)
-        galleryView.reloadData()
+        if configuration.sourceType != .camera {
+            galleryView.reloadData()
+        }
     }
     
     @objc func volumeChanged(_ notification: Notification) {
@@ -249,16 +273,14 @@ open class ImagePickerViewController: UIViewController {
     
     // MARK: - DeviceHelpers
     
-    open override var prefersStatusBarHidden: Bool {
-        return statusBarHidden
-    }
-    
-    func enableGestures(_ enabled: Bool) {
+    fileprivate func enableGestures(_ enabled: Bool) {
         galleryView.alpha = enabled ? 1 : 0
         bottomContainer.pickerButton.isEnabled = enabled
         bottomContainer.tapGestureRecognizer.isEnabled = enabled
-        topView.flashButton.isEnabled = enabled
-        topView.rotateCamera.isEnabled = configuration.canRotateCamera
+        if configuration.sourceType != .photoLibrary {
+            topView.flashButton.isEnabled = enabled
+            topView.rotateCamera.isEnabled = configuration.canRotateCamera
+        }
     }
     
     fileprivate func isBelowImageLimit() -> Bool {
@@ -316,7 +338,7 @@ extension ImagePickerViewController: BottomContainerViewDelegate {
 extension ImagePickerViewController: CameraViewDelegate {
     
     func setFlashButtonHidden(_ hidden: Bool) {
-        if configuration.flashButtonAlwaysHidden {
+        if configuration.sourceType != .photoLibrary && configuration.flashButtonAlwaysHidden {
             topView.flashButton.isHidden = hidden
         }
     }
@@ -332,13 +354,16 @@ extension ImagePickerViewController: CameraViewDelegate {
         }
         
         galleryView.shouldTransform = true
+        
         bottomContainer.pickerButton.isEnabled = true
         
     }
     
     func cameraNotAvailable() {
-        topView.flashButton.isHidden = true
-        topView.rotateCamera.isHidden = true
+        if configuration.sourceType != .photoLibrary {
+            topView.flashButton.isHidden = true
+            topView.rotateCamera.isHidden = true
+        }
         bottomContainer.pickerButton.isEnabled = false
     }
     
@@ -386,12 +411,56 @@ extension ImagePickerViewController: ImageGalleryPanGestureDelegate {
     func panGestureDidEnd(translation: CGPoint, velocity: CGPoint) {
         
     }
+    
+    func shouldSelectItemAt(asset: PHAsset) -> Bool {
+        delegate?.shouldSelectItem(self, asset: asset) == true
+    }
 }
 
 extension ImagePickerViewController {
     
-    func setupConstraints() {
+    func setupPhotoLibrary() {
         
+        let heightView = UIView()
+        heightView.isHidden = true
+        view.addSubview(heightView)
+        heightView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            heightView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            heightView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            heightView.bottomAnchor.constraint(equalTo: bottomContainer.topAnchor)
+        ])
+
+        view.addSubview(galleryView)
+        galleryView.translatesAutoresizingMaskIntoConstraints = false
+        if configuration.sourceType == .photoLibrary {
+            galleryViewTop = galleryView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+            NSLayoutConstraint.activate([
+                heightView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+            ])
+        } else {
+            galleryViewTop = galleryView.topAnchor.constraint(equalTo: topView.bottomAnchor)
+            NSLayoutConstraint.activate([
+                heightView.topAnchor.constraint(equalTo: topView.bottomAnchor)
+            ])
+        }
+        NSLayoutConstraint.activate([
+            galleryView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            galleryView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            galleryViewTop!,
+            galleryView.heightAnchor.constraint(equalTo: heightView.heightAnchor)
+        ])
+        
+    }
+    
+    func setupCamera() {
+        [cameraController.view,topView].forEach { subview in
+            view.addSubview(subview)
+            subview.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        view.addSubview(volumeView)
+        view.sendSubviewToBack(volumeView)
         
         NSLayoutConstraint.activate([
             topView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -399,29 +468,12 @@ extension ImagePickerViewController {
             topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             topView.heightAnchor.constraint(equalToConstant: TopView.Dimensions.height)
         ])
-        
-        let bottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
-        NSLayoutConstraint.activate([
-            bottomContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bottomContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            bottomContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            bottomContainer.heightAnchor.constraint(equalToConstant: BottomContainerView.Dimensions.height+bottom)
-        ])
-        
+
         NSLayoutConstraint.activate([
             cameraController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             cameraController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             cameraController.view.topAnchor.constraint(equalTo: view.topAnchor),
             cameraController.view.bottomAnchor.constraint(equalTo: bottomContainer.topAnchor)
         ])
-        
-        galleryViewTop = galleryView.topAnchor.constraint(equalTo: topView.bottomAnchor)
-        NSLayoutConstraint.activate([
-            galleryView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            galleryView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            galleryViewTop!,
-            galleryView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -BottomContainerView.Dimensions.height-bottom-TopView.Dimensions.height)
-        ])
-        
     }
 }

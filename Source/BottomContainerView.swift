@@ -17,8 +17,8 @@ protocol BottomContainerViewDelegate: AnyObject {
 
 open class BottomContainerView: UIView {
     
-    struct Dimensions {
-        static let height: CGFloat = 100
+    public struct Dimensions {
+        public static var height: CGFloat = 100 + (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0)
     }
     
     var configuration = ImagePickerConfiguration()
@@ -178,11 +178,11 @@ extension BottomContainerView {
         let screenSize = DeviceHelper.screenSizeForOrientation()
         
         addConstraint(NSLayoutConstraint(item: doneButton, attribute: .centerX,
-                                         relatedBy: .equal, toItem: self, attribute: .right,
+                                         relatedBy: .equal, toItem: self, attribute: .trailing,
                                          multiplier: 1, constant: -(screenSize.width - (ButtonPicker.Dimensions.buttonBorderSize + screenSize.width)/2)/2))
         
         addConstraint(NSLayoutConstraint(item: stackView, attribute: .centerX,
-                                         relatedBy: .equal, toItem: self, attribute: .left,
+                                         relatedBy: .equal, toItem: self, attribute: .leading,
                                          multiplier: 1, constant: screenSize.width/4 - ButtonPicker.Dimensions.buttonBorderSize/3))
         
         addConstraint(NSLayoutConstraint(item: topSeparator, attribute: .height,

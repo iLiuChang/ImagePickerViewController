@@ -9,6 +9,14 @@ import UIKit
 
 public struct ImagePickerConfiguration {
     
+    public enum SourceType  {
+        case `default`
+        case photoLibrary
+        case camera
+    }
+
+    public var sourceType: SourceType = .default
+    
     // MARK: Colors
     
     public var backgroundColor = UIColor(red: 0.15, green: 0.19, blue: 0.24, alpha: 1)

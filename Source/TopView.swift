@@ -15,10 +15,10 @@ protocol TopViewDelegate: AnyObject {
 
 open class TopView: UIView {
     
-    struct Dimensions {
-        static let leftOffset: CGFloat = 2
-        static let rightOffset: CGFloat = -7
-        static let height: CGFloat = 44
+    public struct Dimensions {
+        public static var leftOffset: CGFloat = 2
+        public static var rightOffset: CGFloat = -7
+        public static var height: CGFloat = 44
     }
     
     var configuration = ImagePickerConfiguration()
@@ -110,8 +110,8 @@ open class TopView: UIView {
 extension TopView {
     
     func setupConstraints() {
-        addConstraint(NSLayoutConstraint(item: flashButton, attribute: .left,
-                                         relatedBy: .equal, toItem: self, attribute: .left,
+        addConstraint(NSLayoutConstraint(item: flashButton, attribute: .leading,
+                                         relatedBy: .equal, toItem: self, attribute: .leading,
                                          multiplier: 1, constant: Dimensions.leftOffset))
         
         addConstraint(NSLayoutConstraint(item: flashButton, attribute: .centerY,
@@ -127,8 +127,8 @@ extension TopView {
                                          multiplier: 1, constant: Dimensions.height))
 
         if configuration.canRotateCamera {
-            addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .right,
-                                             relatedBy: .equal, toItem: self, attribute: .right,
+            addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .trailing,
+                                             relatedBy: .equal, toItem: self, attribute: .trailing,
                                              multiplier: 1, constant: Dimensions.rightOffset))
             
             addConstraint(NSLayoutConstraint(item: rotateCamera, attribute: .centerY,

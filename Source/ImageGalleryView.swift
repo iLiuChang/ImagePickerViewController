@@ -7,12 +7,12 @@
 
 import UIKit
 import Photos
-
+import MobileCoreServices
 protocol ImageGalleryPanGestureDelegate: AnyObject {
     func panGestureDidStart()
     func panGestureDidChange(_ translation: CGPoint)
     func panGestureDidEnd(translation: CGPoint, velocity: CGPoint)
-
+    func shouldSelectItemAt(asset: PHAsset) -> Bool
 }
 
 open class ImageGalleryView: UIView {
@@ -44,7 +44,7 @@ open class ImageGalleryView: UIView {
         return layout
     }()
     
-    lazy var topSeparator: UIView = { [unowned self] in
+    private lazy var topSeparator: UIView = { [unowned self] in
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.addGestureRecognizer(self.panGestureRecognizer)
@@ -53,7 +53,7 @@ open class ImageGalleryView: UIView {
         return view
     }()
     
-    lazy var panGestureRecognizer: UIPanGestureRecognizer = { [unowned self] in
+    private lazy var panGestureRecognizer: UIPanGestureRecognizer = { [unowned self] in
         let gesture = UIPanGestureRecognizer()
         gesture.addTarget(self, action: #selector(handlePanGestureRecognizer(_:)))
         
@@ -67,6 +67,7 @@ open class ImageGalleryView: UIView {
     var shouldTransform = false
     var imagesBeforeLoading = 0
     var fetchResult: PHFetchResult<AnyObject>?
+    private var topSeparatorHeight: NSLayoutConstraint?
     // MARK: - Initializers
     
     public init(configuration: ImagePickerConfiguration? = nil) {
@@ -87,14 +88,14 @@ open class ImageGalleryView: UIView {
     }
     
     func configure() {
-        
         topSeparator.translatesAutoresizingMaskIntoConstraints = false
         addSubview(topSeparator)
+        topSeparatorHeight = topSeparator.heightAnchor.constraint(equalToConstant: Dimensions.galleryBarHeight)
         NSLayoutConstraint.activate([
             topSeparator.trailingAnchor.constraint(equalTo: trailingAnchor),
             topSeparator.leadingAnchor.constraint(equalTo: leadingAnchor),
             topSeparator.topAnchor.constraint(equalTo: topAnchor),
-            topSeparator.heightAnchor.constraint(equalToConstant: Dimensions.galleryBarHeight)
+            topSeparatorHeight!
         ])
 
         let indicatorView = UIView()
@@ -134,6 +135,12 @@ open class ImageGalleryView: UIView {
     func reloadData() {
         collectionView.reloadData()
     }
+    
+    func hideTopSeparator() {
+        topSeparatorHeight?.constant = 0.5
+        topSeparator.isHidden = true
+    }
+    
     func fetchPhotos(_ completion: (() -> Void)? = nil) {
         AssetManager.fetch(withImageConfiguration: configuration) { assets in
             self.assets.removeAll()
@@ -194,7 +201,7 @@ extension ImageGalleryView: UICollectionViewDelegate {
             }
         }
         
-        let asset = assets[(indexPath as NSIndexPath).row]
+        let asset = assets[indexPath.item]
         
         AssetManager.resolveAsset(asset, size: CGSize(width: 100, height: 100), shouldPreferLowRes: configuration.useLowResolutionPreviewImage) { image in
             guard image != nil else { return }
@@ -207,6 +214,10 @@ extension ImageGalleryView: UICollectionViewDelegate {
                 self.selectedStack.pushAsset(asset)
             }
         }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        delegate?.shouldSelectItemAt(asset: assets[indexPath.item]) == true
     }
 }
 
@@ -254,7 +265,14 @@ extension ImageGalleryView: UICollectionViewDataSource {
                 }
                 
                 cell.selectedView?.isHidden = !self.selectedStack.containsAsset(asset)
-                cell.duration = asset.duration
+                let duration = asset.duration
+                if duration > 0 {
+                    cell.mediaType = .video(duration)
+                } else if asset.value(forKey: "uniformTypeIdentifier") as? String == kUTTypeGIF as String {
+                    cell.mediaType = .gif
+                } else {
+                    cell.mediaType = .unknown
+                }
             }
         }
         
