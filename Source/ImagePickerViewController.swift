@@ -148,6 +148,8 @@ open class ImagePickerViewController: UIViewController {
         self.stack.resetAssets([])
     }
     
+    open func galleryImagesLoadingCompleted() { }
+    
     func checkStatus() {
         if configuration.sourceType == .camera {
             return 
@@ -390,7 +392,7 @@ extension ImagePickerViewController: TopViewDelegate {
 
 // MARK: - Pan gesture handler
 
-extension ImagePickerViewController: ImageGalleryPanGestureDelegate {
+extension ImagePickerViewController: ImageGalleryDelegate {
     
     func panGestureDidStart() {
         galleryViewTopStart = self.galleryViewTop?.constant ?? 0
@@ -414,6 +416,10 @@ extension ImagePickerViewController: ImageGalleryPanGestureDelegate {
     
     func shouldSelectItemAt(asset: PHAsset) -> Bool {
         delegate?.shouldSelectItem(self, asset: asset) == true
+    }
+    
+    func imagesLoadingCompleted() {
+        galleryImagesLoadingCompleted()
     }
 }
 

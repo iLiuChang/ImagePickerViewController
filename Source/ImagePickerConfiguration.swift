@@ -35,7 +35,7 @@ public struct ImagePickerConfiguration {
     public var finishButtonTitle = "Done"
     public var requestPermissionTitle = "Permission denied"
     public var requestPermissionMessage = "Please, allow the application to access to your photo library."
-    
+
     // MARK: Dimensions
     public var cellSpacing: CGFloat = 2
     public var cellColumn: Int = 3

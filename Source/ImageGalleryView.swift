@@ -8,11 +8,12 @@
 import UIKit
 import Photos
 import MobileCoreServices
-protocol ImageGalleryPanGestureDelegate: AnyObject {
+protocol ImageGalleryDelegate: AnyObject {
     func panGestureDidStart()
     func panGestureDidChange(_ translation: CGPoint)
     func panGestureDidEnd(translation: CGPoint, velocity: CGPoint)
     func shouldSelectItemAt(asset: PHAsset) -> Bool
+    func imagesLoadingCompleted()
 }
 
 open class ImageGalleryView: UIView {
@@ -63,7 +64,7 @@ open class ImageGalleryView: UIView {
     open lazy var selectedStack = ImageStack()
     lazy var assets = [PHAsset]() 
     
-    weak var delegate: ImageGalleryPanGestureDelegate?
+    weak var delegate: ImageGalleryDelegate?
     var shouldTransform = false
     var imagesBeforeLoading = 0
     var fetchResult: PHFetchResult<AnyObject>?
@@ -127,7 +128,10 @@ open class ImageGalleryView: UIView {
         
         
         imagesBeforeLoading = 0
-        fetchPhotos()
+        
+        fetchPhotos { [weak self] in
+            self?.delegate?.imagesLoadingCompleted()
+        }
     }
     
     // MARK: - Photos handler
