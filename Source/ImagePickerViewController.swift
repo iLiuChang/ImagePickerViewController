@@ -194,7 +194,9 @@ open class ImagePickerViewController: UIViewController {
     }
     
     fileprivate func permissionGranted() {
-        galleryView.fetchPhotos()
+        galleryView.fetchPhotos { [weak self] in
+            self?.galleryImagesLoadingCompleted()
+        }
         enableGestures(true)
     }
     
